@@ -1,1 +1,143 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pendaftaran HSN 2026 Daerah Bentong</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1f3a3d;--teal:#2f7f86;--teal-d:#25666c;--mist:#eef4f4;--line:#d5e2e3;--sand:#f3ede2}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--mist);color:var(--ink);min-height:100vh}
+.wrap{max-width:640px}
+.hero{border-radius:18px 18px 0 0;overflow:hidden;background:linear-gradient(135deg,#2f7f86,#1f3a3d);min-height:120px}
+.hero img{width:100%;display:block;max-height:260px;object-fit:cover}
+.card-form{background:#fff;border:1px solid var(--line);border-top:0;border-radius:0 0 18px 18px;box-shadow:0 10px 30px rgba(31,58,61,.08)}
+h1{font-size:clamp(1.05rem,3.6vw,1.35rem);font-weight:800;line-height:1.35;letter-spacing:.2px}
+.note{background:var(--sand);border-radius:12px;font-size:.9rem}
+.input-group-text{background:#f6fafa;color:var(--teal);border-color:var(--line);width:46px;justify-content:center}
+.form-control,.form-select{border-color:var(--line)}
+.form-control:focus,.form-select:focus{border-color:var(--teal);box-shadow:0 0 0 .2rem rgba(47,127,134,.15)}
+.btn-main{background:var(--teal);color:#fff;font-weight:700;border:0;padding:.85rem;border-radius:12px}
+.btn-main:hover,.btn-main:focus{background:var(--teal-d);color:#fff}
+.btn-main:disabled{opacity:.7}
+.form-floating>label{color:#6b8588}
+</style>
+</head>
+<body>
+<div class="container wrap py-3 py-md-4">
+  <div class="hero"><img src="images/header.jpg" alt="Hari Sukan Negara 2026 Daerah Bentong" onerror="this.remove()"></div>
+  <div class="card-form p-3 p-md-4">
+    <h1 class="text-center mb-3">PENDAFTARAN HARI SUKAN NEGARA 2026<br>PERINGKAT DAERAH BENTONG</h1>
+    <div class="note p-3 mb-4"><i class="bi bi-gift me-2 text-success"></i>500 pendaftar pertama layak menerima <b>hadiah cabutan bertuah</b>. Satu No. Kad Pengenalan, satu pendaftaran.</div>
 
+    <form id="frm" novalidate>
+      <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-person"></i></span>
+        <div class="form-floating"><input class="form-control" id="nama" placeholder="Nama" autocomplete="name" required><label for="nama">Nama penuh (seperti dalam kad pengenalan)</label></div></div>
+
+      <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
+        <div class="form-floating"><input class="form-control" id="kp" placeholder="No KP" inputmode="numeric" maxlength="14" required><label for="kp">No. Kad Pengenalan (tanpa '-')</label></div></div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-5"><div class="input-group"><span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+          <div class="form-floating"><input class="form-control" id="umur" type="number" min="1" max="120" placeholder="Umur" required><label for="umur">Umur</label></div></div></div>
+        <div class="col-7"><div class="input-group"><span class="input-group-text"><i class="bi bi-gender-ambiguous"></i></span>
+          <div class="form-floating"><select class="form-select" id="jantina" required><option value="" selected disabled></option><option>Lelaki</option><option>Perempuan</option></select><label for="jantina">Jantina</label></div></div></div>
+      </div>
+
+      <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-people"></i></span>
+        <div class="form-floating"><select class="form-select" id="bangsa" required><option value="" selected disabled></option><option>Melayu</option><option>Cina</option><option>India</option><option>Orang Asli</option><option>Bumiputera Sabah</option><option>Bumiputera Sarawak</option><option>Lain-lain</option></select><label for="bangsa">Bangsa</label></div></div>
+
+      <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-telephone"></i></span>
+        <div class="form-floating"><input class="form-control" id="tel" type="tel" inputmode="tel" placeholder="Telefon" autocomplete="tel" required><label for="tel">No. telefon (cth: 0123456789)</label></div></div>
+
+      <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-envelope"></i></span>
+        <div class="form-floating"><input class="form-control" id="emel" type="email" placeholder="Emel" autocomplete="email" required><label for="emel">Alamat emel</label></div></div>
+
+      <button class="btn btn-main w-100 mt-2" id="btn" type="submit"><i class="bi bi-send-check me-2"></i>Daftar sekarang</button>
+    </form>
+  </div>
+  <p class="text-center small text-secondary mt-3 mb-0">Urusetia HSN 2026 Daerah Bentong</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
+const SUPABASE_KEY = 'YOUR-ANON-OR-PUBLISHABLE-KEY';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+const COLOR = '#2f7f86';
+
+// "10:32 pagi" style time in Malaysia time
+function masa(iso){
+  const p = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kuala_Lumpur',hour:'numeric',minute:'2-digit',hour12:false}).formatToParts(new Date(iso));
+  const h = +p.find(x=>x.type==='hour').value, m = p.find(x=>x.type==='minute').value;
+  const h12 = h%12||12, sesi = h<12?'pagi':h<14?'tengah hari':h<19?'petang':'malam';
+  return `${h12}:${m} ${sesi}`;
+}
+function hariIni(iso){
+  const f = d => new Date(d).toLocaleDateString('en-CA',{timeZone:'Asia/Kuala_Lumpur'});
+  return f(iso)===f(new Date()) ? (masa(iso).endsWith('pagi')?'pagi tadi':'tadi') : 'sebelum ini';
+}
+
+// Auto-fill age & gender from IC (both stay editable)
+$('kp').addEventListener('input', e=>{
+  let v = e.target.value.replace(/\D/g,'').slice(0,12);
+  e.target.value = v.length>8 ? `${v.slice(0,6)}-${v.slice(6,8)}-${v.slice(8)}` : v.length>6 ? `${v.slice(0,6)}-${v.slice(6)}` : v;
+  if(v.length===12){
+    const yy=+v.slice(0,2), mm=+v.slice(2,4)-1, dd=+v.slice(4,6), now=new Date();
+    let yr = 2000+yy; if(yr>now.getFullYear()) yr-=100;
+    const dob=new Date(yr,mm,dd); let age=now.getFullYear()-yr;
+    if(now < new Date(now.getFullYear(),mm,dd)) age--;
+    if(!isNaN(dob) && age>=0 && age<=120) $('umur').value = age;
+    $('jantina').value = (+v.slice(-1))%2 ? 'Lelaki':'Perempuan';
+  }
+});
+
+const bad = (msg)=>Swal.fire({icon:'warning',title:'Semak maklumat anda',text:msg,confirmButtonColor:COLOR,confirmButtonText:'Baik'});
+
+$('frm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const nama=$('nama').value.trim().replace(/\s+/g,' ').toUpperCase(), kp=$('kp').value.replace(/\D/g,''),
+        umur=parseInt($('umur').value,10), tel=$('tel').value.replace(/[\s-]/g,''), emel=$('emel').value.trim().toLowerCase();
+  if(nama.length<3) return bad('Sila isi nama penuh.');
+  if(kp.length!==12) return bad('No. Kad Pengenalan mesti 12 digit.');
+  if(!(umur>=1&&umur<=120)) return bad('Umur tidak sah.');
+  if(!$('jantina').value||!$('bangsa').value) return bad('Sila pilih jantina dan bangsa.');
+  if(!/^(\+?60|0)1\d{8,9}$/.test(tel)) return bad('No. telefon tidak sah. Contoh: 0123456789');
+  if(!/^\S+@\S+\.\S+$/.test(emel)) return bad('Alamat emel tidak sah.');
+
+  const btn=$('btn'); btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Sedang mendaftar...';
+  try{
+    const {data,error} = await db.rpc('daftar_peserta',{p_nama:nama,p_no_kp:kp,p_umur:umur,p_jantina:$('jantina').value,
+      p_bangsa:$('bangsa').value,p_telefon:tel,p_emel:emel,p_alamat:null,p_pekerjaan:null});
+    if(error) throw error;
+
+    if(data.status==='duplicate'){
+      if(data.menang) localStorage.setItem('hsn_winner',JSON.stringify({nama:data.nama,nombor:data.nombor}));
+      return Swal.fire({icon:'error',title:'Sudah berdaftar',
+        html:`Anda telah mendaftar pada jam <b>${masa(data.tarikh)}</b> ${hariIni(data.tarikh)}.<br>Tidak boleh daftar lagi, wekkk! 😜`,
+        confirmButtonColor:COLOR,confirmButtonText:'Faham'}).then(()=>{ if(data.menang) location.href='winner.html'; });
+    }
+    $('frm').reset();
+    if(data.menang){
+      localStorage.setItem('hsn_winner',JSON.stringify({nama:data.nama,nombor:data.nombor}));
+      await Swal.fire({icon:'success',title:'Pendaftaran berjaya!',text:'Anda terpilih dalam cabutan bertuah. Sila tunggu...',timer:2200,showConfirmButton:false});
+      location.href='winner.html';
+    }else{
+      Swal.fire({icon:'success',title:'Pendaftaran berjaya!',
+        html:`Terima kasih, <b>${data.nama}</b>.<br>Anda telah berjaya mendaftar untuk Hari Sukan Negara 2026 Peringkat Daerah Bentong.<br><small class="text-secondary">Kuota cabutan bertuah (500 pendaftar pertama) telah penuh.</small>`,
+        confirmButtonColor:COLOR,confirmButtonText:'Tutup'});
+    }
+  }catch(err){
+    console.error(err);
+    Swal.fire({icon:'error',title:'Pendaftaran gagal',text:'Sambungan bermasalah atau pelayan sibuk. Sila cuba lagi sebentar lagi.',confirmButtonColor:COLOR,confirmButtonText:'Cuba lagi'});
+  }finally{
+    btn.disabled=false; btn.innerHTML='<i class="bi bi-send-check me-2"></i>Daftar sekarang';
+  }
+});
+</script>
+</body>
+</html>
