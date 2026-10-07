@@ -69,8 +69,8 @@ h1{font-size:clamp(1.05rem,3.6vw,1.35rem);font-weight:800;line-height:1.35;lette
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script>
-const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';
-const SUPABASE_KEY = 'YOUR-ANON-OR-PUBLISHABLE-KEY';
+const SUPABASE_URL = 'https://nhurluxysrsqbsvghauh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_BwfA_o_Hr-RU1wZpMLaDPw_Rzwn_cCK';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 const COLOR = '#2f7f86';
@@ -133,24 +133,26 @@ $('bangsa').addEventListener('change', e=>{
   $('bangsaLainWrap').classList.toggle('d-none', !lain);
   if(lain) $('bangsaLain').focus(); else $('bangsaLain').value='';
 });
-const bad = (msg)=>Swal.fire({icon:'warning',title:'Semak maklumat anda',text:msg,confirmButtonColor:COLOR,confirmButtonText:'Baik'});
+const fokus = id => setTimeout(()=>$(id).focus(), 50);   // small delay so it wins over SweetAlert's own focus restore
+const bad = (msg, id)=>Swal.fire({icon:'warning',title:'Semak maklumat anda',text:msg,confirmButtonColor:COLOR,confirmButtonText:'Baik'})
+  .then(()=>{ if(id) fokus(id); });
 
 $('frm').addEventListener('submit', async e=>{
   e.preventDefault();
   const nama=$('nama').value.trim().replace(/\s+/g,' ').toUpperCase(), kp=$('kp').value.replace(/\D/g,''),
         umur=parseInt($('umur').value,10), tel=$('tel').value.replace(/[\s-]/g,''), emel=$('emel').value.trim().toLowerCase();
-  if(nama.length<3) return bad('Sila isi nama penuh.');
-  if(kp.length!==12) return bad('No. Kad Pengenalan mesti 12 digit.');
-  if(!(umur>=1&&umur<=120)) return bad('Umur tidak sah.');
-  if(!$('jantina').value||!$('bangsa').value) return bad('Sila pilih jantina dan bangsa.');
-  let bangsa = $('bangsa').value;
-  if(bangsa==='Lain-lain'){
-    const t = $('bangsaLain').value.trim().replace(/\s+/g,' ');
-    if(t.length<3) return bad('Sila nyatakan bangsa anda.');
-    bangsa = `Lain-lain (${t})`;
-  }
-  if(!/^(\+?60|0)1\d{8,9}$/.test(tel)) return bad('No. telefon tidak sah. Contoh: 0123456789');
-  if(!/^\S+@\S+\.\S+$/.test(emel)) return bad('Alamat emel tidak sah.');
+  if(nama.length<3) return bad('Sila isi nama penuh.','nama');
+if(kp.length!==12) return bad('No. Kad Pengenalan mesti 12 digit.','kp');
+if(!(umur>=1&&umur<=120)) return bad('Umur tidak sah.','umur');
+if(!$('jantina').value||!$('bangsa').value) return bad('Sila pilih jantina dan bangsa.', $('jantina').value?'bangsa':'jantina');
+let bangsa = $('bangsa').value;
+if(bangsa==='Lain-lain'){
+  const t = $('bangsaLain').value.trim().replace(/\s+/g,' ');
+  if(t.length<3) return bad('Sila nyatakan bangsa anda.','bangsaLain');
+  bangsa = `Lain-lain (${t})`;
+}
+if(!/^(\+?60|0)1\d{8,9}$/.test(tel)) return bad('No. telefon tidak sah. Contoh: 0123456789','tel');
+if(!/^\S+@\S+\.\S+$/.test(emel)) return bad('Alamat emel tidak sah.','emel');
 
   const btn=$('btn'); btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Sedang mendaftar...';
   try{
@@ -162,7 +164,7 @@ $('frm').addEventListener('submit', async e=>{
       if(data.menang) sessionStorage.setItem('hsn_winner','1');
       return Swal.fire({icon:'error',title:'Sudah berdaftar',
         html:`Anda telah mendaftar pada jam <b>${masa(data.tarikh)}</b> ${hariIni(data.tarikh)}.<br>Tidak boleh daftar lagi, wekkk! 😜`,
-        confirmButtonColor:COLOR,confirmButtonText:'Faham'}).then(()=>{ if(data.menang) location.href='winner.html'; });
+        confirmButtonColor:COLOR,confirmButtonText:'Faham'}).then(()=>{ if(data.menang) location.href='winner.html'; else fokus('nama'); });
     }
     $('frm').reset();
     $('bangsaLainWrap').classList.add('d-none');
@@ -178,15 +180,16 @@ $('frm').addEventListener('submit', async e=>{
           try{ await muatTurunSijil(data.nama, kp); }
           catch(e){ console.error(e); Swal.showValidationMessage('Gagal menjana sijil. Sila cuba lagi.'); }
           return false;
-        }});
+        }}).then(()=>fokus('nama'));
     }
   }catch(err){
     console.error(err);
-    Swal.fire({icon:'error',title:'Pendaftaran gagal',text:'Sambungan bermasalah atau pelayan sibuk. Sila cuba lagi sebentar lagi.',confirmButtonColor:COLOR,confirmButtonText:'Cuba lagi'});
+    Swal.fire({icon:'error',title:'Pendaftaran gagal',text:'Sambungan bermasalah atau pelayan sibuk. Sila cuba lagi sebentar lagi.',confirmButtonColor:COLOR,confirmButtonText:'Cuba lagi'}).then(()=>fokus('nama'));
   }finally{
     btn.disabled=false; btn.innerHTML='<i class="bi bi-send-check me-2"></i>Daftar sekarang';
   }
 });
+if(matchMedia('(pointer:fine)').matches) fokus('nama');
 </script>
 </body>
 </html>
