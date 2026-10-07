@@ -1,6 +1,6 @@
 // Shared certificate generator (used by index.html and winner.html)
 // mm values are measured from the top edge of the page
-const SIJIL = { url:'assets/sijil-template.jpg', nameYmm:99, icGapMm:8, size:18, maxWmm:170 };
+const SIJIL = { url:'assets/sijil-template.jpg', nameYmm:102, icGapMm:8, size:18, maxWmm:170 };
 const mm = v => v*72/25.4;
 
 async function muatTurunSijil(nama, kp){
