@@ -43,7 +43,7 @@ h1{font-size:clamp(1.05rem,3.6vw,1.35rem);font-weight:800;line-height:1.35;lette
 
       <div class="row g-3 mb-3">
         <div class="col-5"><div class="input-group"><span class="input-group-text"><i class="bi bi-calendar3"></i></span>
-          <div class="form-floating"><input class="form-control" id="umur" type="number" min="1" max="120" placeholder="Umur" required><label for="umur">Umur</label></div></div></div>
+          <div class="form-floating"><input class="form-control" id="umur" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="Umur" autocomplete="off" required><label for="umur">Umur</label></div></div></div>
         <div class="col-7"><div class="input-group"><span class="input-group-text"><i class="bi bi-gender-ambiguous"></i></span>
           <div class="form-floating"><select class="form-select" id="jantina" required><option value="" selected disabled></option><option>Lelaki</option><option>Perempuan</option></select><label for="jantina">Jantina</label></div></div></div>
       </div>
@@ -54,7 +54,7 @@ h1{font-size:clamp(1.05rem,3.6vw,1.35rem);font-weight:800;line-height:1.35;lette
   <div class="form-floating"><input class="form-control" id="bangsaLain" placeholder="Nyatakan bangsa" maxlength="25"><label for="bangsaLain">Nyatakan bangsa anda</label></div></div>
 
       <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-telephone"></i></span>
-        <div class="form-floating"><input class="form-control" id="tel" type="tel" inputmode="tel" placeholder="Telefon" autocomplete="tel" required><label for="tel">No. telefon (cth: 0123456789)</label></div></div>
+        <div class="form-floating"><input class="form-control" id="tel" inputmode="numeric" placeholder="Telefon" autocomplete="tel" required><label for="tel">No. telefon (cth: 0123456789)</label></div></div>
 
       <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-envelope"></i></span>
         <div class="form-floating"><input class="form-control" id="emel" type="email" placeholder="Emel" autocomplete="email" required><label for="emel">Alamat emel</label></div></div>
@@ -133,6 +133,14 @@ $('bangsa').addEventListener('change', e=>{
   $('bangsaLainWrap').classList.toggle('d-none', !lain);
   if(lain) $('bangsaLain').focus(); else $('bangsaLain').value='';
 });
+// Uppercase text fields while typing (keeps the cursor where it was)
+['nama','bangsaLain'].forEach(id=>$(id).addEventListener('input', e=>{
+  const el=e.target, s=el.selectionStart, t=el.selectionEnd;
+  el.value = el.value.toUpperCase();
+  el.setSelectionRange(s,t);
+}));
+// Age: digits only
+$('umur').addEventListener('input', e=>{ e.target.value = e.target.value.replace(/\D/g,'').slice(0,3); });
 const fokus = id => setTimeout(()=>$(id).focus(), 50);   // small delay so it wins over SweetAlert's own focus restore
 const bad = (msg, id)=>Swal.fire({icon:'warning',title:'Semak maklumat anda',text:msg,confirmButtonColor:COLOR,confirmButtonText:'Baik'})
   .then(()=>{ if(id) fokus(id); });
@@ -157,7 +165,7 @@ if(!/^\S+@\S+\.\S+$/.test(emel)) return bad('Alamat emel tidak sah.','emel');
   const btn=$('btn'); btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Sedang mendaftar...';
   try{
     const {data,error} = await db.rpc('daftar_peserta',{p_nama:nama,p_no_kp:kp,p_umur:umur,p_jantina:$('jantina').value,
-      p_bangsa:$('bangsa').value,p_telefon:tel,p_emel:emel,p_alamat:null,p_pekerjaan:null});
+      p_bangsa:bangsa,p_telefon:tel,p_emel:emel,p_alamat:null,p_pekerjaan:null});
     if(error) throw error;
 
     if(data.status==='duplicate'){
