@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pemenang Cabutan Bertuah HSN 2026 Bentong</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
 <script>
-// Only reachable right after a winning registration (flag set by index.html)
-if (sessionStorage.getItem('hsn_winner') !== '1') location.replace('index.html');
+// Only reachable right after a winning registration (set by index.html)
+try{ if(!JSON.parse(sessionStorage.getItem('hsn_winner')).kp) throw 0; }catch(e){ location.replace('index.html'); }
 </script>
 <style>
-:root{--ink:#1f3a3d;--teal:#2f7f86;--mist:#eef4f4;--sand:#f3ede2;--line:#d5e2e3}
+:root{--ink:#1f3a3d;--teal:#2f7f86;--teal-d:#25666c;--mist:#eef4f4;--sand:#f3ede2;--line:#d5e2e3}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--ink);background:var(--mist);
@@ -22,6 +23,11 @@ main{width:100%;max-width:620px;text-align:center;background:#fff;border:1px sol
 h1{margin:0;font-weight:800;font-size:clamp(1.6rem,7vw,2.5rem);line-height:1.25;color:var(--teal)}
 .claim{margin:0;padding:clamp(20px,5vw,30px) clamp(20px,6vw,44px);background:var(--sand);
   font-weight:800;font-size:clamp(1rem,4vw,1.3rem);line-height:1.5}
+.dl{padding:22px clamp(20px,6vw,44px) 28px}
+button{font:inherit;font-weight:700;background:var(--teal);color:#fff;border:0;border-radius:12px;padding:.8rem 1.4rem;cursor:pointer;width:100%;max-width:320px}
+button:hover{background:var(--teal-d)} button:disabled{opacity:.7;cursor:default}
+button:focus-visible{outline:3px solid rgba(47,127,134,.35);outline-offset:2px}
+#ralat{margin:.7rem 0 0;color:#b3382c;font-size:.9rem;min-height:1.2em}
 @keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){main{animation:none}}
 </style>
@@ -30,6 +36,23 @@ h1{margin:0;font-weight:800;font-size:clamp(1.6rem,7vw,2.5rem);line-height:1.25;
 <main>
   <div class="win"><h1>TAHNIAH, ANDA PEMENANG CABUTAN BERTUAH HSN 2026 BENTONG!</h1></div>
   <p class="claim">SILA TUNTUT HADIAH ANDA PADA JAM 10.00 PAGI HINGGA 11.30 PAGI DI KAUNTER URUSETIA HSN</p>
+  <div class="dl">
+    <button id="sijil"><i class="bi bi-download me-1"></i> Muat turun sijil penyertaan</button>
+    <p id="ralat" role="alert"></p>
+  </div>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="assets/sijil.js"></script>
+<script>
+const w = JSON.parse(sessionStorage.getItem('hsn_winner'));
+const b = document.getElementById('sijil'), r = document.getElementById('ralat');
+b.addEventListener('click', async ()=>{
+  const label = b.innerHTML; b.disabled = true; b.textContent = 'Sedang menjana...'; r.textContent = '';
+  try{ await muatTurunSijil(w.nama, w.kp); }
+  catch(e){ console.error(e); r.textContent = 'Gagal menjana sijil. Sila cuba lagi.'; }
+  b.disabled = false; b.innerHTML = label;
+});
+</script>
 </body>
 </html>
