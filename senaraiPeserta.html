@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Senarai Peserta HSN 2026</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1f3a3d;--teal:#2f7f86;--teal-d:#25666c;--mist:#eef4f4;--line:#d5e2e3;--sand:#f3ede2}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--mist);color:var(--ink);min-height:100vh}
+.card-x{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(31,58,61,.08)}
+h1{font-size:clamp(1.05rem,3.4vw,1.35rem);font-weight:800;line-height:1.35;margin:0}
+.input-group-text{background:#f6fafa;color:var(--teal);border-color:var(--line);width:46px;justify-content:center}
+.form-control,.form-select{border-color:var(--line)}
+.form-control:focus,.form-select:focus{border-color:var(--teal);box-shadow:0 0 0 .2rem rgba(47,127,134,.15)}
+.form-floating>label{color:#6b8588}
+.btn-main{background:var(--teal);color:#fff;font-weight:700;border:0;border-radius:12px}
+.btn-main:hover,.btn-main:focus{background:var(--teal-d);color:#fff}
+.btn-main:disabled{opacity:.7}
+.btn-soft{background:#fff;color:var(--teal);border:1px solid var(--line);border-radius:12px;font-weight:700}
+.btn-soft:hover{background:#f6fafa;color:var(--teal-d)}
+.table{--bs-table-bg:transparent;margin:0;font-size:.92rem}
+.table thead th{background:#f6fafa;color:var(--ink);border-bottom:1px solid var(--line);white-space:nowrap;font-weight:700}
+.table td{vertical-align:middle;border-color:var(--line)}
+.table tbody tr:hover{background:#f9fcfc}
+.act .btn{--bs-btn-padding-y:.2rem;--bs-btn-padding-x:.5rem;border-radius:8px}
+.badge-soft{background:var(--sand);color:var(--ink);font-weight:600}
+.modal-content{border:0;border-radius:18px}
+</style>
+</head>
+<body>
+
+<!-- LOG MASUK -->
+<div id="loginView" class="container py-5 d-none" style="max-width:430px">
+  <div class="card-x p-4">
+    <h1 class="text-center mb-1">SENARAI PESERTA HSN 2026</h1>
+    <p class="text-center text-secondary mb-4">Log masuk pentadbir</p>
+    <form id="frmLogin" novalidate>
+      <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-envelope"></i></span>
+        <div class="form-floating"><input class="form-control" id="lEmel" type="email" placeholder="Emel" autocomplete="username" required><label for="lEmel">Emel</label></div></div>
+      <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-lock"></i></span>
+        <div class="form-floating"><input class="form-control" id="lKata" type="password" placeholder="Kata laluan" autocomplete="current-password" required><label for="lKata">Kata laluan</label></div></div>
+      <button class="btn btn-main w-100 py-2" id="lBtn" type="submit"><i class="bi bi-box-arrow-in-right me-2"></i>Log masuk</button>
+    </form>
+  </div>
+</div>
+
+<!-- APLIKASI -->
+<div id="appView" class="container-xl py-3 py-md-4 d-none">
+  <div class="card-x p-3 mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <div><h1>SENARAI PESERTA HSN 2026 DAERAH BENTONG</h1>
+      <span class="badge badge-soft rounded-pill mt-1" id="jumlah">Jumlah: -</span></div>
+    <div class="d-flex align-items-center gap-2">
+      <small class="text-secondary d-none d-md-inline" id="pengguna"></small>
+      <button class="btn btn-soft btn-sm px-3" id="btnKeluar"><i class="bi bi-box-arrow-right me-1"></i>Log keluar</button>
+    </div>
+  </div>
+
+  <div class="row g-2 mb-3">
+    <div class="col-12 col-md">
+      <div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input class="form-control form-control-lg" id="cari" placeholder="Cari nama, No. KP, telefon atau emel" autocomplete="off"></div>
+    </div>
+    <div class="col-6 col-md-auto"><button class="btn btn-soft btn-lg w-100" id="btnEksport"><i class="bi bi-file-earmark-excel me-2"></i>Eksport Excel</button></div>
+    <div class="col-6 col-md-auto"><button class="btn btn-main btn-lg w-100" id="btnTambah"><i class="bi bi-plus-lg me-2"></i>Tambah</button></div>
+  </div>
+
+  <div class="card-x overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead><tr><th>Bil.</th><th>Nama penuh</th><th>No. KP</th><th>Umur</th><th>Jantina</th><th>Bangsa</th><th>Telefon</th><th>Emel</th><th>Tarikh daftar</th><th class="text-end">Tindakan</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 p-3 border-top" style="border-color:var(--line)!important">
+      <small class="text-secondary" id="info"></small>
+      <div class="btn-group">
+        <button class="btn btn-soft btn-sm px-3" id="prev"><i class="bi bi-chevron-left"></i></button>
+        <button class="btn btn-soft btn-sm px-3" id="next"><i class="bi bi-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAMBAH / KEMASKINI -->
+<div class="modal fade" id="mdl" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <form id="frmP" novalidate>
+        <div class="modal-header border-0 pb-0"><h1 id="mdlTajuk"></h1><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button></div>
+        <div class="modal-body">
+          <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-person"></i></span>
+            <div class="form-floating"><input class="form-control" id="fNama" placeholder="Nama" autocapitalize="characters"><label for="fNama">Nama penuh</label></div></div>
+          <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
+            <div class="form-floating"><input class="form-control" id="fKp" placeholder="No KP" inputmode="numeric" maxlength="12"><label for="fKp">No. Kad Pengenalan (12 digit)</label></div></div>
+          <div class="row g-3 mb-3">
+            <div class="col-5"><div class="input-group"><span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+              <div class="form-floating"><input class="form-control" id="fUmur" inputmode="numeric" maxlength="3" placeholder="Umur"><label for="fUmur">Umur</label></div></div></div>
+            <div class="col-7"><div class="input-group"><span class="input-group-text"><i class="bi bi-gender-ambiguous"></i></span>
+              <div class="form-floating"><select class="form-select" id="fJantina"><option value="" selected disabled></option><option>Lelaki</option><option>Perempuan</option></select><label for="fJantina">Jantina</label></div></div></div>
+          </div>
+          <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-people"></i></span>
+            <div class="form-floating"><input class="form-control" id="fBangsa" list="lsBangsa" placeholder="Bangsa" maxlength="40"><label for="fBangsa">Bangsa</label></div></div>
+          <datalist id="lsBangsa"><option>MELAYU</option><option>CINA</option><option>INDIA</option><option>ORANG ASLI</option><option>BUMIPUTERA SABAH</option><option>BUMIPUTERA SARAWAK</option></datalist>
+          <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-telephone"></i></span>
+            <div class="form-floating"><input class="form-control" id="fTel" inputmode="numeric" placeholder="Telefon"><label for="fTel">No. telefon</label></div></div>
+          <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-envelope"></i></span>
+            <div class="form-floating"><input class="form-control" id="fEmel" type="email" placeholder="Emel"><label for="fEmel">Alamat emel</label></div></div>
+          <div class="input-group mb-3"><span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+            <div class="form-floating"><input class="form-control" id="fAlamat" placeholder="Alamat"><label for="fAlamat">Alamat (pilihan)</label></div></div>
+          <div class="input-group"><span class="input-group-text"><i class="bi bi-briefcase"></i></span>
+            <div class="form-floating"><input class="form-control" id="fKerja" placeholder="Pekerjaan"><label for="fKerja">Pekerjaan (pilihan)</label></div></div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-soft px-4" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-main px-4" id="btnSimpan"><i class="bi bi-check2-circle me-1"></i>Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const db = supabase.createClient('https://nhurluxysrsqbsvghauh.supabase.co','sb_publishable_BwfA_o_Hr-RU1wZpMLaDPw_Rzwn_cCK');
+const $ = id => document.getElementById(id);
+const COLOR = '#2f7f86', SAIZ = 25;
+let halaman = 0, jumlah = 0, kata = '', editId = null, rows = {}, mdl;
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
+const tarikh = iso => new Date(iso).toLocaleString('en-GB',{timeZone:'Asia/Kuala_Lumpur',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
+const amaran = (msg, id) => Swal.fire({icon:'warning',title:'Semak maklumat',text:msg,confirmButtonColor:COLOR,confirmButtonText:'Baik'}).then(()=>{ if(id) setTimeout(()=>$(id).focus(),50); });
+const ralat = (msg) => Swal.fire({icon:'error',title:'Tidak berjaya',text:msg,confirmButtonColor:COLOR,confirmButtonText:'Tutup'});
+const toast = (msg) => Swal.fire({toast:true,position:'top-end',icon:'success',title:msg,showConfirmButton:false,timer:2000});
+
+/* ---------- Log masuk ---------- */
+function paparLogin(){ $('appView').classList.add('d-none'); $('loginView').classList.remove('d-none'); }
+async function paparApp(sesi){
+  const {data:admin} = await db.rpc('is_admin');
+  if(!admin){ await db.auth.signOut(); paparLogin(); return ralat('Akaun ini bukan akaun pentadbir.'); }
+  $('pengguna').textContent = sesi.user.email;
+  $('loginView').classList.add('d-none'); $('appView').classList.remove('d-none');
+  muat();
+}
+$('frmLogin').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const btn=$('lBtn'); btn.disabled=true;
+  const {data,error} = await db.auth.signInWithPassword({email:$('lEmel').value.trim(), password:$('lKata').value});
+  btn.disabled=false;
+  if(error) return ralat('Emel atau kata laluan tidak betul.');
+  $('lKata').value=''; paparApp(data.session);
+});
+$('btnKeluar').addEventListener('click', async ()=>{ await db.auth.signOut(); paparLogin(); });
+(async()=>{ const {data} = await db.auth.getSession(); data.session ? paparApp(data.session) : paparLogin(); })();
+
+/* ---------- Senarai ---------- */
+function tapis(q){
+  const t = kata.replace(/[,()*%\\]/g,' ').trim();
+  return t ? q.or(`nama_penuh.ilike.*${t}*,no_kp.ilike.*${t}*,no_telefon.ilike.*${t}*,alamat_emel.ilike.*${t}*`) : q;
+}
+async function muat(){
+  $('tbody').innerHTML = '<tr><td colspan="10" class="text-center text-secondary py-4">Memuatkan...</td></tr>';
+  const dari = halaman*SAIZ;
+  const {data,count,error} = await tapis(db.from('pendaftaran').select('*',{count:'exact'}))
+    .order('tarikh_pendaftaran',{ascending:true}).range(dari, dari+SAIZ-1);
+  if(error){ $('tbody').innerHTML=''; return ralat('Gagal memuatkan senarai. Sila cuba lagi.'); }
+  jumlah = count ?? 0; rows = {};
+  $('tbody').innerHTML = data.length ? data.map((p,i)=>{ rows[p.id]=p; return `<tr>
+    <td>${dari+i+1}</td><td class="fw-semibold">${esc(p.nama_penuh)}</td><td>${esc(p.no_kp)}</td><td>${p.umur}</td>
+    <td>${esc(p.jantina)}</td><td>${esc(p.bangsa)}</td><td>${esc(p.no_telefon)}</td><td>${esc(p.alamat_emel)}</td>
+    <td class="text-nowrap">${tarikh(p.tarikh_pendaftaran)}</td>
+    <td class="text-end text-nowrap act">
+      <button class="btn btn-soft" data-edit="${p.id}" title="Kemaskini"><i class="bi bi-pencil"></i></button>
+      <button class="btn btn-outline-danger" data-del="${p.id}" title="Padam"><i class="bi bi-trash"></i></button></td></tr>`; }).join('')
+    : '<tr><td colspan="10" class="text-center text-secondary py-4">Tiada peserta ditemui.</td></tr>';
+  $('jumlah').textContent = `Jumlah: ${jumlah.toLocaleString('en-GB')}`;
+  $('info').textContent = jumlah ? `Menunjukkan ${dari+1}–${dari+data.length} daripada ${jumlah.toLocaleString('en-GB')}` : '';
+  $('prev').disabled = halaman===0; $('next').disabled = dari+SAIZ >= jumlah;
+}
+$('prev').addEventListener('click', ()=>{ halaman--; muat(); });
+$('next').addEventListener('click', ()=>{ halaman++; muat(); });
+let tmr; $('cari').addEventListener('input', e=>{ clearTimeout(tmr); tmr=setTimeout(()=>{ kata=e.target.value; halaman=0; muat(); },300); });
+$('tbody').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.edit) bukaForm(b.dataset.edit); if(b.dataset.del) padam(b.dataset.del);
+});
+
+/* ---------- Tambah / Kemaskini ---------- */
+mdl = new bootstrap.Modal($('mdl'));
+['fNama','fBangsa','fKerja'].forEach(id=>$(id).addEventListener('input', e=>{
+  const el=e.target, s=el.selectionStart, t=el.selectionEnd; el.value=el.value.toUpperCase(); el.setSelectionRange(s,t);
+}));
+['fKp','fUmur'].forEach(id=>$(id).addEventListener('input', e=>{ e.target.value=e.target.value.replace(/\D/g,''); }));
+function bukaForm(id){
+  editId = id || null; const p = id ? rows[id] : {};
+  $('mdlTajuk').textContent = id ? 'Kemaskini peserta' : 'Tambah peserta';
+  $('fNama').value=p.nama_penuh||''; $('fKp').value=p.no_kp||''; $('fUmur').value=p.umur??''; $('fJantina').value=p.jantina||'';
+  $('fBangsa').value=p.bangsa||''; $('fTel').value=p.no_telefon||''; $('fEmel').value=p.alamat_emel||'';
+  $('fAlamat').value=p.alamat||''; $('fKerja').value=p.pekerjaan||'';
+  mdl.show();
+}
+$('btnTambah').addEventListener('click', ()=>bukaForm());
+$('mdl').addEventListener('shown.bs.modal', ()=>$('fNama').focus());
+
+$('frmP').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const r = { nama_penuh:$('fNama').value.trim().replace(/\s+/g,' ').toUpperCase(), no_kp:$('fKp').value, umur:parseInt($('fUmur').value,10),
+    jantina:$('fJantina').value, bangsa:$('fBangsa').value.trim().toUpperCase(), no_telefon:$('fTel').value.replace(/[\s-]/g,''),
+    alamat_emel:$('fEmel').value.trim().toLowerCase(), alamat:$('fAlamat').value.trim()||null, pekerjaan:$('fKerja').value.trim().toUpperCase()||null };
+  if(r.nama_penuh.length<3) return amaran('Sila isi nama penuh.','fNama');
+  if(!/^\d{12}$/.test(r.no_kp)) return amaran('No. Kad Pengenalan mesti 12 digit.','fKp');
+  if(!(r.umur>=1&&r.umur<=120)) return amaran('Umur tidak sah.','fUmur');
+  if(!r.jantina) return amaran('Sila pilih jantina.','fJantina');
+  if(!r.bangsa) return amaran('Sila isi bangsa.','fBangsa');
+  if(!/^(\+?60|0)1\d{8,9}$/.test(r.no_telefon)) return amaran('No. telefon tidak sah. Contoh: 0123456789','fTel');
+  if(!/^\S+@\S+\.\S+$/.test(r.alamat_emel)) return amaran('Alamat emel tidak sah.','fEmel');
+  const btn=$('btnSimpan'); btn.disabled=true;
+  const {error} = editId ? await db.from('pendaftaran').update(r).eq('id',editId) : await db.from('pendaftaran').insert(r);
+  btn.disabled=false;
+  if(error) return ralat(error.code==='23505' ? 'No. Kad Pengenalan ini sudah didaftarkan.' : 'Gagal menyimpan. Sila cuba lagi.');
+  mdl.hide(); toast(editId ? 'Maklumat dikemaskini' : 'Peserta ditambah'); muat();
+});
+
+/* ---------- Padam ---------- */
+async function padam(id){
+  const p = rows[id]; if(!p) return;
+  const k = await Swal.fire({icon:'warning',title:'Padam peserta ini?',html:`<b>${esc(p.nama_penuh)}</b><br>${esc(p.no_kp)}<br><small>Tindakan ini tidak boleh dibatalkan.</small>`,
+    showCancelButton:true,confirmButtonText:'Padam',cancelButtonText:'Batal',confirmButtonColor:'#c0392b',focusCancel:true});
+  if(!k.isConfirmed) return;
+  const {error} = await db.from('pendaftaran').delete().eq('id',id);
+  if(error) return ralat('Gagal memadam. Sila cuba lagi.');
+  toast('Peserta dipadam');
+  if(rows && Object.keys(rows).length===1 && halaman>0) halaman--;
+  muat();
+}
+
+/* ---------- Eksport Excel (ikut carian semasa) ---------- */
+const selamat = v => (typeof v==='string' && /^[=+\-@]/.test(v)) ? "'"+v : (v ?? '');   // stops Excel formula injection
+async function eksport(){
+  const btn=$('btnEksport'), label=btn.innerHTML; btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Menyediakan...';
+  try{
+    let semua=[], dari=0;
+    while(true){
+      const {data,error} = await tapis(db.from('pendaftaran').select('*')).order('tarikh_pendaftaran',{ascending:true}).range(dari,dari+999);
+      if(error) throw error;
+      semua = semua.concat(data); if(data.length<1000) break; dari+=1000;
+    }
+    if(!semua.length) return amaran('Tiada data untuk dieksport.');
+    const baris = semua.map((p,i)=>({'Bil.':i+1,'Nama Penuh':selamat(p.nama_penuh),'No. KP':p.no_kp,'Umur':p.umur,'Jantina':p.jantina,'Bangsa':selamat(p.bangsa),
+      'No. Telefon':p.no_telefon,'Emel':selamat(p.alamat_emel),'Alamat':selamat(p.alamat),'Pekerjaan':selamat(p.pekerjaan),'Tarikh Pendaftaran':tarikh(p.tarikh_pendaftaran)}));
+    const ws = XLSX.utils.json_to_sheet(baris);
+    ws['!cols'] = [6,38,15,7,11,20,14,32,30,22,20].map(w=>({wch:w}));
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Peserta');
+    XLSX.writeFile(wb, `Senarai-Peserta-HSN2026-${new Date().toISOString().slice(0,10)}.xlsx`);
+  }catch(err){ console.error(err); ralat('Gagal mengeksport. Sila cuba lagi.'); }
+  finally{ btn.disabled=false; btn.innerHTML=label; }
+}
+$('btnEksport').addEventListener('click', eksport);
+</script>
+</body>
+</html>
