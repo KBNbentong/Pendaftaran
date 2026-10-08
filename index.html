@@ -76,7 +76,7 @@ const SUPABASE_KEY = 'sb_publishable_BwfA_o_Hr-RU1wZpMLaDPw_Rzwn_cCK';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:false, autoRefreshToken:false}});
 const $ = id => document.getElementById(id);
 const COLOR = '#2f7f86';
-const WINNER_AKTIF = false;   // change to true once the organizers confirm the number of winners
+const WINNER_AKTIF = true;   // change to true once the organizers confirm the number of winners
 
 // "10:32 pagi" style time in Malaysia time
 function masa(iso){
