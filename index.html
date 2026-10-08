@@ -167,7 +167,7 @@ if(!/^\S+@\S+\.\S+$/.test(emel)) return bad('Alamat emel tidak sah.','emel');
     }
   }catch(err){
     console.error(err);
-    Swal.fire({icon:'error',title:'Pendaftaran gagal',text:'Sambungan bermasalah atau pelayan sibuk. Sila cuba lagi sebentar lagi.',confirmButtonColor:COLOR,confirmButtonText:'Cuba lagi'}).then(()=>fokus('nama'));
+    Swal.fire({icon:'error',title:'Pendaftaran gagal',text:'Sambungan bermasalah. ('+(err.message||err)+')',confirmButtonColor:COLOR,confirmButtonText:'Cuba lagi'}).then(()=>fokus('nama'));
   }finally{
     btn.disabled=false; btn.innerHTML='<i class="bi bi-send-check me-2"></i>Daftar sekarang';
   }
