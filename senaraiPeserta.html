@@ -128,6 +128,8 @@ h1{font-size:clamp(1.05rem,3.4vw,1.35rem);font-weight:800;line-height:1.35;margi
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="assets/sijil.js"></script>
 <script>
 const db = supabase.createClient('https://nhurluxysrsqbsvghauh.supabase.co','sb_publishable_BwfA_o_Hr-RU1wZpMLaDPw_Rzwn_cCK');
 const $ = id => document.getElementById(id);
@@ -177,6 +179,7 @@ async function muat(){
     <td>${esc(p.jantina)}</td><td>${esc(p.bangsa)}</td><td>${esc(p.no_telefon)}</td><td>${esc(p.alamat_emel)}</td>
     <td class="text-nowrap">${tarikh(p.tarikh_pendaftaran)}</td>
     <td class="text-end text-nowrap act">
+      <button class="btn btn-soft" data-sijil="${p.id}" title="Muat turun sijil"><i class="bi bi-award"></i></button>
       <button class="btn btn-soft" data-edit="${p.id}" title="Kemaskini"><i class="bi bi-pencil"></i></button>
       <button class="btn btn-outline-danger" data-del="${p.id}" title="Padam"><i class="bi bi-trash"></i></button></td></tr>`; }).join('')
     : '<tr><td colspan="10" class="text-center text-secondary py-4">Tiada peserta ditemui.</td></tr>';
@@ -189,7 +192,9 @@ $('next').addEventListener('click', ()=>{ halaman++; muat(); });
 let tmr; $('cari').addEventListener('input', e=>{ clearTimeout(tmr); tmr=setTimeout(()=>{ kata=e.target.value; halaman=0; muat(); },300); });
 $('tbody').addEventListener('click', e=>{
   const b = e.target.closest('button'); if(!b) return;
-  if(b.dataset.edit) bukaForm(b.dataset.edit); if(b.dataset.del) padam(b.dataset.del);
+  if(b.dataset.sijil) sijil(b.dataset.sijil, b);
+  if(b.dataset.edit) bukaForm(b.dataset.edit);
+  if(b.dataset.del) padam(b.dataset.del);
 });
 
 /* ---------- Tambah / Kemaskini ---------- */
@@ -239,6 +244,15 @@ async function padam(id){
   toast('Peserta dipadam');
   if(rows && Object.keys(rows).length===1 && halaman>0) halaman--;
   muat();
+}
+
+/* ---------- Sijil ---------- */
+async function sijil(id, btn){
+  const p = rows[id]; if(!p) return;
+  const lama = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+  try{ await muatTurunSijil(p.nama_penuh, p.no_kp); }
+  catch(e){ console.error(e); ralat('Gagal menjana sijil. Sila cuba lagi.'); }
+  btn.disabled = false; btn.innerHTML = lama;
 }
 
 /* ---------- Eksport Excel (ikut carian semasa) ---------- */
