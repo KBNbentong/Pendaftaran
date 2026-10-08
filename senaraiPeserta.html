@@ -65,6 +65,12 @@ h1{font-size:clamp(1.05rem,3.4vw,1.35rem);font-weight:800;line-height:1.35;margi
       <div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span>
         <input class="form-control form-control-lg" id="cari" placeholder="Cari nama, No. KP, telefon atau emel" autocomplete="off"></div>
     </div>
+    <div class="col-12 col-md-auto">
+      <select class="form-select form-select-lg" id="tapisMenang">
+        <option value="">Semua peserta</option>
+        <option value="1">Pemenang sahaja</option>
+      </select>
+    </div>
     <div class="col-6 col-md-auto"><button class="btn btn-soft btn-lg w-100" id="btnEksport"><i class="bi bi-file-earmark-excel me-2"></i>Eksport Excel</button></div>
     <div class="col-6 col-md-auto"><button class="btn btn-main btn-lg w-100" id="btnTambah"><i class="bi bi-plus-lg me-2"></i>Tambah</button></div>
   </div>
@@ -134,7 +140,7 @@ h1{font-size:clamp(1.05rem,3.4vw,1.35rem);font-weight:800;line-height:1.35;margi
 const db = supabase.createClient('https://nhurluxysrsqbsvghauh.supabase.co','sb_publishable_BwfA_o_Hr-RU1wZpMLaDPw_Rzwn_cCK');
 const $ = id => document.getElementById(id);
 const COLOR = '#2f7f86', SAIZ = 25;
-let halaman = 0, jumlah = 0, kata = '', editId = null, rows = {}, mdl;
+let halaman = 0, jumlah = 0, kata = '', editId = null, rows = {}, mdl, pemenang = new Set(), hanyaMenang = false;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 const tarikh = iso => new Date(iso).toLocaleString('en-GB',{timeZone:'Asia/Kuala_Lumpur',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
@@ -149,6 +155,8 @@ async function paparApp(sesi){
   if(!admin){ await db.auth.signOut(); paparLogin(); return ralat('Akaun ini bukan akaun pentadbir.'); }
   $('pengguna').textContent = sesi.user.email;
   $('loginView').classList.add('d-none'); $('appView').classList.remove('d-none');
+  const {data:nb} = await db.from('nombor_bertuah').select('no');
+  pemenang = new Set((nb||[]).map(x=>x.no));
   muat();
 }
 $('frmLogin').addEventListener('submit', async e=>{
@@ -165,6 +173,7 @@ $('btnKeluar').addEventListener('click', async ()=>{ await db.auth.signOut(); pa
 /* ---------- Senarai ---------- */
 function tapis(q){
   const t = kata.replace(/[,()*%\\]/g,' ').trim();
+  if(hanyaMenang) q = q.in('bil', pemenang.size ? [...pemenang] : [-1]);
   return t ? q.or(`nama_penuh.ilike.*${t}*,no_kp.ilike.*${t}*,no_telefon.ilike.*${t}*,alamat_emel.ilike.*${t}*`) : q;
 }
 async function muat(){
@@ -175,7 +184,7 @@ async function muat(){
   if(error){ $('tbody').innerHTML=''; return ralat('Gagal memuatkan senarai. Sila cuba lagi.'); }
   jumlah = count ?? 0; rows = {};
   $('tbody').innerHTML = data.length ? data.map((p,i)=>{ rows[p.id]=p; return `<tr>
-    <td>${dari+i+1}</td><td class="fw-semibold">${esc(p.nama_penuh)}</td><td>${esc(p.no_kp)}</td><td>${p.umur}</td>
+    <td>${p.bil ?? '-'}</td><td class="fw-semibold">${esc(p.nama_penuh)}${pemenang.has(p.bil) ? ' <span class="badge bg-success rounded-pill ms-1"><i class="bi bi-trophy-fill me-1"></i>Pemenang</span>' : ''}</td><td>${esc(p.no_kp)}</td><td>${p.umur}</td>
     <td>${esc(p.jantina)}</td><td>${esc(p.bangsa)}</td><td>${esc(p.no_telefon)}</td><td>${esc(p.alamat_emel)}</td>
     <td class="text-nowrap">${tarikh(p.tarikh_pendaftaran)}</td>
     <td class="text-end text-nowrap act">
@@ -190,6 +199,7 @@ async function muat(){
 $('prev').addEventListener('click', ()=>{ halaman--; muat(); });
 $('next').addEventListener('click', ()=>{ halaman++; muat(); });
 let tmr; $('cari').addEventListener('input', e=>{ clearTimeout(tmr); tmr=setTimeout(()=>{ kata=e.target.value; halaman=0; muat(); },300); });
+$('tapisMenang').addEventListener('change', e=>{ hanyaMenang = e.target.value==='1'; halaman=0; muat(); });
 $('tbody').addEventListener('click', e=>{
   const b = e.target.closest('button'); if(!b) return;
   if(b.dataset.sijil) sijil(b.dataset.sijil, b);
@@ -267,10 +277,10 @@ async function eksport(){
       semua = semua.concat(data); if(data.length<1000) break; dari+=1000;
     }
     if(!semua.length) return amaran('Tiada data untuk dieksport.');
-    const baris = semua.map((p,i)=>({'Bil.':i+1,'Nama Penuh':selamat(p.nama_penuh),'No. KP':p.no_kp,'Umur':p.umur,'Jantina':p.jantina,'Bangsa':selamat(p.bangsa),
+    const baris = semua.map((p,i)=>({'Bil.':i+1,'No. Pendaftaran':p.bil ?? '','Pemenang':pemenang.has(p.bil)?'YA':'','Nama Penuh':selamat(p.nama_penuh),'No. KP':p.no_kp,'Umur':p.umur,'Jantina':p.jantina,'Bangsa':selamat(p.bangsa),
       'No. Telefon':p.no_telefon,'Emel':selamat(p.alamat_emel),'Alamat':selamat(p.alamat),'Pekerjaan':selamat(p.pekerjaan),'Tarikh Pendaftaran':tarikh(p.tarikh_pendaftaran)}));
     const ws = XLSX.utils.json_to_sheet(baris);
-    ws['!cols'] = [6,38,15,7,11,20,14,32,30,22,20].map(w=>({wch:w}));
+    ws['!cols'] = [6,14,10,38,15,7,11,20,14,32,30,22,20].map(w=>({wch:w}));
     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Peserta');
     XLSX.writeFile(wb, `Senarai-Peserta-HSN2026-${new Date().toISOString().slice(0,10)}.xlsx`);
   }catch(err){ console.error(err); ralat('Gagal mengeksport. Sila cuba lagi.'); }
