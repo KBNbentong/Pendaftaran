@@ -144,11 +144,21 @@ if(!/^\S+@\S+\.\S+$/.test(emel)) return bad('Alamat emel tidak sah.','emel');
     if(error) throw error;
 
     if(data.status==='duplicate'){
-      const menang = WINNER_AKTIF && data.menang;
-      if(menang) sessionStorage.setItem('hsn_winner', JSON.stringify({nama, kp}));
-      return Swal.fire({icon:'error',title:'Sudah berdaftar',
-        html:`Anda telah mendaftar pada jam <b>${masa(data.tarikh)}</b> ${hariIni(data.tarikh)}.<br>Pendaftaran anda telah direkodkan dan tidak perlu mendaftar semula. 😊`,
-        confirmButtonColor:COLOR,confirmButtonText:'Faham'}).then(()=>{ if(menang) location.href='winner.html'; else fokus('nama'); });
+      const nm = data.nama || nama;
+      const info = `Anda telah mendaftar pada jam <b>${masa(data.tarikh)}</b> ${hariIni(data.tarikh)}.<br>Pendaftaran anda telah direkodkan dan tidak perlu mendaftar semula. 😊`;
+      if(WINNER_AKTIF && data.menang){
+        sessionStorage.setItem('hsn_winner', JSON.stringify({nama:nm, kp}));
+        return Swal.fire({icon:'error',title:'Sudah berdaftar',html:info,confirmButtonColor:COLOR,confirmButtonText:'Faham'})
+          .then(()=>{ location.href='winner.html'; });
+      }
+      return Swal.fire({icon:'error',title:'Sudah berdaftar',html:info,
+        confirmButtonColor:COLOR, confirmButtonText:'<i class="bi bi-download me-1"></i>Muat turun sijil',
+        showCancelButton:true, cancelButtonText:'Tutup', allowOutsideClick:false, showLoaderOnConfirm:true,
+        preConfirm: async ()=>{
+          try{ await muatTurunSijil(nm, kp); }
+          catch(e){ console.error(e); Swal.showValidationMessage('Gagal menjana sijil. Sila cuba lagi.'); }
+          return false;
+        }}).then(()=>fokus('nama'));
     }
     $('frm').reset();
     $('bangsaLainWrap').classList.add('d-none');
