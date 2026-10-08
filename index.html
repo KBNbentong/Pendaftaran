@@ -146,7 +146,7 @@ if(!/^\S+@\S+\.\S+$/.test(emel)) return bad('Alamat emel tidak sah.','emel');
       const menang = WINNER_AKTIF && data.menang;
       if(menang) sessionStorage.setItem('hsn_winner', JSON.stringify({nama, kp}));
       return Swal.fire({icon:'error',title:'Sudah berdaftar',
-        html:`Anda telah mendaftar pada jam <b>${masa(data.tarikh)}</b> ${hariIni(data.tarikh)}.<br>Tidak boleh daftar lagi, wekkk! 😜`,
+        html:`Anda telah mendaftar pada jam <b>${masa(data.tarikh)}</b> ${hariIni(data.tarikh)}.<br>Pendaftaran anda telah direkodkan dan tidak perlu mendaftar semula. 😊`,
         confirmButtonColor:COLOR,confirmButtonText:'Faham'}).then(()=>{ if(menang) location.href='winner.html'; else fokus('nama'); });
     }
     $('frm').reset();
