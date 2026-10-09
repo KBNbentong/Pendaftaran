@@ -56,6 +56,7 @@ h1{font-size:clamp(1.05rem,3.4vw,1.35rem);font-weight:800;line-height:1.35;margi
       <span class="badge badge-soft rounded-pill mt-1" id="jumlah">Jumlah: -</span></div>
     <div class="d-flex align-items-center gap-2">
       <small class="text-secondary d-none d-md-inline" id="pengguna"></small>
+      <button class="btn btn-soft btn-sm px-3" id="btnMuat" title="Muat semula"><i class="bi bi-arrow-clockwise me-1"></i>Muat semula</button>
       <button class="btn btn-soft btn-sm px-3" id="btnKeluar"><i class="bi bi-box-arrow-right me-1"></i>Log keluar</button>
     </div>
   </div>
@@ -176,12 +177,15 @@ function tapis(q){
   if(hanyaMenang) q = q.in('bil', pemenang.size ? [...pemenang] : [-1]);
   return t ? q.or(`nama_penuh.ilike.*${t}*,no_kp.ilike.*${t}*,no_telefon.ilike.*${t}*,alamat_emel.ilike.*${t}*`) : q;
 }
-async function muat(){
-  $('tbody').innerHTML = '<tr><td colspan="10" class="text-center text-secondary py-4">Memuatkan...</td></tr>';
+let muatId = 0;
+async function muat(senyap){
+  const id = ++muatId;
+  if(!senyap) $('tbody').innerHTML = '<tr><td colspan="10" class="text-center text-secondary py-4">Memuatkan...</td></tr>';
   const dari = halaman*SAIZ;
   const {data,count,error} = await tapis(db.from('pendaftaran').select('*',{count:'exact'}))
-    .order('tarikh_pendaftaran',{ascending:true}).range(dari, dari+SAIZ-1);
-  if(error){ $('tbody').innerHTML=''; return ralat('Gagal memuatkan senarai. Sila cuba lagi.'); }
+    .order('tarikh_pendaftaran',{ascending:false}).range(dari, dari+SAIZ-1);
+  if(id!==muatId) return;   // a newer request has started, ignore this old result
+  if(error){ if(senyap) return; $('tbody').innerHTML=''; return ralat('Gagal memuatkan senarai. Sila cuba lagi.'); }
   jumlah = count ?? 0; rows = {};
   $('tbody').innerHTML = data.length ? data.map((p,i)=>{ rows[p.id]=p; return `<tr>
     <td>${p.bil ?? '-'}</td><td class="fw-semibold">${esc(p.nama_penuh)}${pemenang.has(p.bil) ? ' <span class="badge bg-success rounded-pill ms-1"><i class="bi bi-trophy-fill me-1"></i>Pemenang</span>' : ''}</td><td>${esc(p.no_kp)}</td><td>${p.umur}</td>
@@ -286,6 +290,13 @@ async function eksport(){
   }catch(err){ console.error(err); ralat('Gagal mengeksport. Sila cuba lagi.'); }
   finally{ btn.disabled=false; btn.innerHTML=label; }
 }
+  /* ---------- Muat semula ---------- */
+$('btnMuat').addEventListener('click', ()=>muat());
+setInterval(()=>{
+  if(document.hidden || $('appView').classList.contains('d-none')) return;
+  if($('mdl').classList.contains('show') || Swal.isVisible()) return;
+  muat(true);
+}, 15000);
 $('btnEksport').addEventListener('click', eksport);
 </script>
 </body>
